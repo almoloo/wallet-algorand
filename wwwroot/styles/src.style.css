@@ -1,20 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;500;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-:root {
-    --background-color: #393E41;
-    --foreground-color: #444A5B;
-    --text-color: #F2F4F6;
-    --success-color: #00A03E;
-    --danger-color: #C1292E;
-}
 
 html {
     font-size: 16px;
 }
 
 body {
-    background-color: var(--background-color);
-    color: var(--text-color);
+    font-family: 'Manrope',
+    sans-serif;
 }

@@ -9,7 +9,7 @@ const {
 	Timestamp,
 	FieldValue,
 } = require('firebase-admin/firestore')
-const serviceAccount = require('../wallet-algo-firebase-adminsdk-hdbms-0a6a6071f5.json')
+const serviceAccount = require(process.env.FIREBASE_KEY)
 const { JsonWebTokenError } = require('jsonwebtoken')
 initializeApp({
 	credential: cert(serviceAccount),

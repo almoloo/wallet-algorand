@@ -1,7 +1,11 @@
 module.exports = {
 	content: ['./views/**/*.ejs'],
 	theme: {
-		extend: {},
+		extend: {
+			gridTemplateRows: {
+				'welcome-header': '1fr minmax(min-content, max-content)',
+			},
+		},
 		colors: {
 			'gray-dark': '#393E41',
 			'gray-light': '#707070',
