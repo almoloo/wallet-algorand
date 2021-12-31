@@ -1,10 +1,22 @@
 <%- include('layout/login-head.ejs') %>
 
-<div>
-    <h1 class="text-3xl m-10">
-        <span class="block font-normal text-white/75 mb-1">Welcome to</span>
+<div class="m-10 flex flex-col lg:justify-center">
+    <h1 class="text-3xl">
+        <span class="block font-normal text-slate-400 mb-1">Welcome to</span>
         <strong class="block font-extrabold">ALGOWALLET</strong>
     </h1>
+    <p class="text-slate-200 my-5">
+        Manage your algos in a secure, friendly space.
+    </p>
+    <div class="flex flex-col">
+        <a href="/register"
+            class="bg-green-500 hover:bg-green-600 active:bg-green-700 transition-all text-center rounded p-4 mb-3">Generate
+            new
+            wallet</a>
+        <a href="/login"
+            class="bg-gray-700 hover:bg-gray-700/75 active:bg-gray-700/50 transition-all text-center rounded p-4">Restore
+            wallet</a>
+    </div>
 </div>
 
 <%- include('layout/login-foot.ejs') %>
