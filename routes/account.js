@@ -12,18 +12,18 @@ const QRCode = require('qrcode')
 router.post('/register', async (req, res) => {
 	// CHECK IF USERNAME IS PROVIDED IN REQUEST
 	const username = req.body.username
-	if (!username) {
+	const password = req.body.password
+	if (!username || !password) {
 		res.status(400).json({
 			success: false,
-			message: 'Username is required.',
+			message: 'Username and password are required.',
 		})
 	} else {
 		// CHECK IF USERNAME DOESN'T ALREADY EXIST
 		const user = await usersCollection.where('username', '==', username).get()
 		if (user.empty) {
 			// USERNAME DOESN'T EXIST, CREATE NEW USER
-			const userSecret = crypto.randomBytes(8).toString('hex')
-			const hashedSecret = bcrypt.hashSync(userSecret, 10)
+			const hashedSecret = bcrypt.hashSync(password, 10)
 			const algoWallet = await Tatum.generateAlgoWallet()
 			const newUser = await usersCollection.add({
 				username: username,
@@ -41,16 +41,15 @@ router.post('/register', async (req, res) => {
 			}
 			const accessToken = jwt.sign(userObject, process.env.TOKEN_SECRET)
 			res
+				.cookie('account', accessToken, { maxAge: 3600000, httpOnly: true })
 				.json({
 					success: true,
 					message: 'User created.',
 					data: {
 						username: username,
-						secret: userSecret,
 						token: accessToken,
 					},
 				})
-				.cookie('account', accessToken, { maxAge: 3600000, httpOnly: true })
 		} else {
 			// USERNAME ALREADY EXISTS
 			res.status(400).json({
@@ -91,13 +90,15 @@ router.post('/login', async (req, res) => {
 					wallet: userData.wallet.address,
 				}
 				const accessToken = jwt.sign(userObject, process.env.TOKEN_SECRET)
-				res.json({
-					success: true,
-					message: 'User logged in.',
-					data: {
-						token: accessToken,
-					},
-				})
+				res
+					.cookie('account', accessToken, { maxAge: 3600000, httpOnly: true })
+					.json({
+						success: true,
+						message: 'User logged in.',
+						data: {
+							token: accessToken,
+						},
+					})
 			} else {
 				// SECRET IS INCORRECT
 				res.status(400).json({

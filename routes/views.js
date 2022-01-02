@@ -1,12 +1,19 @@
 const express = require('express')
 const router = express.Router()
-const cookieParser = require('cookie-parser')
+const jwt = require('jsonwebtoken')
 
 // ----- Welcome
 router.get('/', (req, res) => {
 	const accountCookie = req.cookies.account
-	if (accountCookie) {
-	} else {
+	try {
+		jwt.verify(accountCookie, process.env.TOKEN_SECRET, (err, user) => {
+			if (err) {
+				throw err
+			} else {
+				res.send('logged in')
+			}
+		})
+	} catch (err) {
 		res.render('welcome')
 	}
 })
@@ -19,6 +26,11 @@ router.get('/login', (req, res) => {
 // ----- Register
 router.get('/register', (req, res) => {
 	res.render('register')
+})
+
+// ----- Logout
+router.get('/logout', (req, res) => {
+	res.clearCookie('account').redirect('/')
 })
 
 module.exports = router
