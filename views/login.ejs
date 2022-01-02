@@ -49,11 +49,11 @@
                 url: '/api/account/login',
                 data: {
                     username: usernameInput.value,
-                    password: usernameInput.value
+                    password: passwordInput.value
                 }
             })
             .then(function (response) {
-                document.location = '/'
+                location.href = '/'
             })
             .catch(function (err) {
                 if (err.response.data) {

@@ -81,7 +81,7 @@ router.post('/login', async (req, res) => {
 		} else {
 			// CHECK IF PASSWORD IS CORRECT
 			const userData = user.docs[0].data()
-			const secretIsValid = bcrypt.compareSync(password, userData.secret)
+			const secretIsValid = await bcrypt.compareSync(password, userData.secret)
 			if (secretIsValid) {
 				// SECRET IS CORRECT, LOG USER IN
 				const userObject = {
