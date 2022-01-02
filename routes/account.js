@@ -40,15 +40,17 @@ router.post('/register', async (req, res) => {
 				username: username,
 			}
 			const accessToken = jwt.sign(userObject, process.env.TOKEN_SECRET)
-			res.json({
-				success: true,
-				message: 'User created.',
-				data: {
-					username: username,
-					secret: userSecret,
-					token: accessToken,
-				},
-			})
+			res
+				.json({
+					success: true,
+					message: 'User created.',
+					data: {
+						username: username,
+						secret: userSecret,
+						token: accessToken,
+					},
+				})
+				.cookie('account', accessToken, { maxAge: 3600000, httpOnly: true })
 		} else {
 			// USERNAME ALREADY EXISTS
 			res.status(400).json({
