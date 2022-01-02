@@ -20,17 +20,34 @@ router.get('/', (req, res) => {
 
 // ----- Login
 router.get('/login', (req, res) => {
-	res.render('login')
+	const accountCookie = req.cookies.account
+	try {
+		jwt.verify(accountCookie, process.env.TOKEN_SECRET, (err, user) => {
+			if (err) {
+				throw err
+			} else {
+				res.redirect('/')
+			}
+		})
+	} catch (err) {
+		res.render('login')
+	}
 })
 
 // ----- Register
 router.get('/register', (req, res) => {
-	res.render('register')
-})
-
-// ----- Logout
-router.get('/logout', (req, res) => {
-	res.clearCookie('account').redirect('/')
+	const accountCookie = req.cookies.account
+	try {
+		jwt.verify(accountCookie, process.env.TOKEN_SECRET, (err, user) => {
+			if (err) {
+				throw err
+			} else {
+				res.redirect('/')
+			}
+		})
+	} catch (err) {
+		res.render('register')
+	}
 })
 
 module.exports = router
