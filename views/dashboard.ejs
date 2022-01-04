@@ -1,0 +1,82 @@
+<%- include('layout/dashboard-head.ejs') %>
+
+<aside class="sticky top-0">
+    <!-- WALLET ACTIONS -->
+    <div class="bg-gray-700 lg:rounded-lg p-8 mb-6">
+        <div class="flex lg:hidden items-center justify-between mb-6">
+            <h1 class="font-bold">My wallet</h1>
+            <button id="refresh-btn" class="hover:text-gray-400 bg-gray-800 rounded-full p-3">
+                <svg role="img" class="h-4 w-4">
+                    <use xlink:href="/img/sprite.svg#icon-gear-fill"></use>
+                </svg>
+            </button>
+        </div>
+        <div class="flex justify-between items-start">
+            <div>
+                <strong class="text-white text-3xl">700.00</strong>
+                <small class="text-gray-300 ml-1">ALGO</small>
+                <small class="block text-gray-300 mt-1">$1,176</small>
+            </div>
+            <button id="refresh-btn"
+                class="bg-gray-500 hover:bg-gray-600 active:bg-gray-600/50 rounded-full transition-all p-2">
+                <svg role="img" class="h-6 w-6">
+                    <use xlink:href="/img/sprite.svg#icon-arrow-clockwise"></use>
+                </svg>
+            </button>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mt-8">
+            <button id="send-btn"
+                class="bg-gray-500 hover:bg-gray-600 active:bg-gray-600/50 rounded transition-all pt-2 pb-3">Send</button>
+            <button id="receive-btn"
+                class="bg-gray-500 hover:bg-gray-600 active:bg-gray-600/50 rounded transition-all pt-2 pb-3">Receive</button>
+        </div>
+    </div>
+    <!-- NETWORK SELECTOR -->
+    <div class="bg-gray-700 lg:rounded-lg p-8 mb-6">
+        <h1 class="font-bold mb-6">Network</h1>
+        <div class="grid grid-cols-2">
+            <div>
+                <input type="radio" class="peer hidden" name="network-toggle" id="testnet-network-toggle"
+                    value="testnet" checked>
+                <label for="testnet-network-toggle"
+                    class="block cursor-pointer peer-checked:cursor-default bg-gray-600/50 peer-checked:bg-gray-500 text-gray-400 peer-checked:text-white rounded-l text-center pt-2 pb-3">Testnet</label>
+            </div>
+            <div>
+                <input type="radio" class="peer hidden" name="network-toggle" id="mainnet-network-toggle"
+                    value="mainnet">
+                <label for="mainnet-network-toggle"
+                    class="block cursor-pointer peer-checked:cursor-default bg-gray-600/50 peer-checked:bg-gray-500 text-gray-400 peer-checked:text-white rounded-r text-center pt-2 pb-3">Testnet</label>
+            </div>
+        </div>
+    </div>
+    <!-- LOGOUT BUTTON -->
+    <div class="bg-gray-700 lg:rounded-lg p-8">
+        <h1 class="font-bold mb-6">Navigation</h1>
+        <ul>
+            <li>
+                <a href="#">Admin panel</a>
+            </li>
+            <li>
+                <a href="#">Logout</a>
+            </li>
+        </ul>
+    </div>
+</aside>
+<main>
+    <h1 class="font-bold hidden lg:block mb-6">Transactions</h1>
+    <!-- EMPTY STATE -->
+    <div id="transactions-empty-state"
+        class="lg:bg-gray-700/25 rounded-lg flex flex-col items-center justify-center p-12 lg:my-auto">
+        <svg role="img" class="text-gray-400 animate-pulse h-10 w-10 mb-4">
+            <use xlink:href="/img/sprite.svg#icon-bricks"></use>
+        </svg>
+        <h2 class="font-medium text-lg text-gray-300 mb-1">Nothing to see here!</h2>
+        <p class="text-gray-400 text-sm">Make some transactions to fill this part.</p>
+    </div>
+</main>
+
+<%- include('layout/login-foot.ejs') %>
+
+<script>
+
+</script>

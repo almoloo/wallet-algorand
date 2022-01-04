@@ -11,7 +11,7 @@ const QRCode = require('qrcode')
 // ----- REGISTER USER
 router.post('/register', async (req, res) => {
 	// CHECK IF USERNAME IS PROVIDED IN REQUEST
-	const username = req.body.username
+	const username = req.body.username.toLowerCase()
 	const password = req.body.password
 	if (!username || !password) {
 		res.status(400).json({
@@ -41,7 +41,8 @@ router.post('/register', async (req, res) => {
 			}
 			const accessToken = jwt.sign(userObject, process.env.TOKEN_SECRET)
 			res
-				.cookie('account', accessToken, { maxAge: 3600000, httpOnly: true })
+				.cookie('account', accessToken, { maxAge: 2600000000, httpOnly: true })
+				.cookie('testnet', '1', { maxAge: 26000000000, httpOnly: true })
 				.json({
 					success: true,
 					message: 'User created.',
@@ -63,7 +64,7 @@ router.post('/register', async (req, res) => {
 // ----- LOGIN USER
 router.post('/login', async (req, res) => {
 	// CHECK IF USERNAME & PASSWORD ARE PROVIDED IN REQUEST
-	const username = req.body.username
+	const username = req.body.username.toLowerCase()
 	const password = req.body.password
 	if (!username || !password) {
 		res.status(400).json({
@@ -91,7 +92,10 @@ router.post('/login', async (req, res) => {
 				}
 				const accessToken = jwt.sign(userObject, process.env.TOKEN_SECRET)
 				res
-					.cookie('account', accessToken, { maxAge: 3600000, httpOnly: true })
+					.cookie('account', accessToken, {
+						maxAge: 2600000000,
+						httpOnly: true,
+					})
 					.json({
 						success: true,
 						message: 'User logged in.',

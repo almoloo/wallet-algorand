@@ -10,12 +10,6 @@ router.get('/balance', authenticateToken, async (req, res) => {
 	const user = await usersCollection
 		.where('username', '==', req.user.username)
 		.get()
-	if (user.empty) {
-		res.sendStatus(401).json({
-			success: false,
-			message: 'User not found.',
-		})
-	}
 	const rawUserData = user.docs[0].data()
 	const accountBalance = await Tatum.algorandGetAccountBalance(
 		rawUserData.wallet.address
@@ -28,6 +22,21 @@ router.get('/balance', authenticateToken, async (req, res) => {
 			fee: 0,
 		},
 	})
+})
+
+// ----- GET USER TRANSACTIONS
+router.get('/transactions', authenticateToken, async (req, res) => {
+	// console.log(req.cookies.testnet)
+	const user = await usersCollection
+		.where('username', '==', req.user.username)
+		.get()
+	const rawUserData = user.docs[0].data()
+	// console.log(Tatum)
+	// res.json(rawUserData)
+	const transactions = await Tatum.algorandGetTransactionsCount(
+		rawUserData.wallet.address
+	)
+	res.send(transactions)
 })
 
 module.exports = router
