@@ -2,6 +2,8 @@ const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken')
 const usersCollection = require('../middlewares/db')
+const getTransactions = require('../middlewares/gettransactions')
+const { default: axios } = require('axios')
 
 // ----- Welcome
 router.get('/', (req, res) => {
@@ -16,7 +18,13 @@ router.get('/', (req, res) => {
 				if (userDB.empty || !userDB.docs[0].data().enabled) {
 					res.clearCookie('account').render('welcome')
 				}
-				res.render('dashboard')
+				const transactions = await getTransactions(
+					userDB.docs[0].data().wallet.address
+				)
+				res.render('dashboard', {
+					transactions: transactions,
+					wallet: userDB.docs[0].data().wallet.address,
+				})
 			})
 		} catch (err) {
 			res.clearCookie('account').render('welcome')

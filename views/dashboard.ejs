@@ -2,7 +2,7 @@
 
 <aside class="sticky top-0">
     <!-- WALLET ACTIONS -->
-    <div class="bg-gray-700 lg:rounded-lg p-8 mb-6">
+    <div class="bg-gray-700 lg:rounded-lg p-8 lg:mb-6">
         <div class="flex lg:hidden items-center justify-between mb-6">
             <h1 class="font-bold">My wallet</h1>
             <button id="refresh-btn" class="hover:text-gray-400 bg-gray-800 rounded-full p-3">
@@ -31,26 +31,8 @@
                 class="bg-gray-500 hover:bg-gray-600 active:bg-gray-600/50 rounded transition-all pt-2 pb-3">Receive</button>
         </div>
     </div>
-    <!-- NETWORK SELECTOR -->
-    <div class="bg-gray-700 lg:rounded-lg p-8 mb-6">
-        <h1 class="font-bold mb-6">Network</h1>
-        <div class="grid grid-cols-2">
-            <div>
-                <input type="radio" class="peer hidden" name="network-toggle" id="testnet-network-toggle"
-                    value="testnet" checked>
-                <label for="testnet-network-toggle"
-                    class="block cursor-pointer peer-checked:cursor-default bg-gray-600/50 peer-checked:bg-gray-500 text-gray-400 peer-checked:text-white rounded-l text-center pt-2 pb-3">Testnet</label>
-            </div>
-            <div>
-                <input type="radio" class="peer hidden" name="network-toggle" id="mainnet-network-toggle"
-                    value="mainnet">
-                <label for="mainnet-network-toggle"
-                    class="block cursor-pointer peer-checked:cursor-default bg-gray-600/50 peer-checked:bg-gray-500 text-gray-400 peer-checked:text-white rounded-r text-center pt-2 pb-3">Testnet</label>
-            </div>
-        </div>
-    </div>
     <!-- LOGOUT BUTTON -->
-    <div class="bg-gray-700 lg:rounded-lg p-8">
+    <div class="bg-gray-700 lg:rounded-lg p-8 hidden lg:block">
         <h1 class="font-bold mb-6">Navigation</h1>
         <ul>
             <li>
@@ -62,21 +44,290 @@
         </ul>
     </div>
 </aside>
-<main>
-    <h1 class="font-bold hidden lg:block mb-6">Transactions</h1>
-    <!-- EMPTY STATE -->
-    <div id="transactions-empty-state"
-        class="lg:bg-gray-700/25 rounded-lg flex flex-col items-center justify-center p-12 lg:my-auto">
-        <svg role="img" class="text-gray-400 animate-pulse h-10 w-10 mb-4">
-            <use xlink:href="/img/sprite.svg#icon-bricks"></use>
+<main class="flex flex-col" id="transactions-container">
+    <h1 class="font-bold hidden lg:block">Transactions</h1>
+    <% if (transactions.data.length > 0) { %>
+    <!-- TRANSACTIONS -->
+    <%
+        var lastDate = null
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    %>
+    <% transactions.data.forEach(element => { %>
+    <%
+        var currentDateObj = new Date(element.date * 1000)
+        var currentFullDate = currentDateObj.toLocaleDateString()
+        var currentDisplayDate = `${months[currentFullDate.split('/')[0] - 1]} ${currentFullDate.split('/')[1]} ${currentFullDate.split('/')[2]}`
+    %>
+    <% if (lastDate !== currentDisplayDate) { %>
+    <small
+        class="inline-block bg-zinc-700 rounded-full text-zinc-300 text-xs mx-auto px-4 py-1 my-4 lg:my-3"><%= currentDisplayDate %></small>
+    <% lastDate = currentDisplayDate %>
+    <% } %>
+    <div class="transaction-wrapper cursor-pointer flex items-center flex-shrink-0 lg:bg-zinc-700/25 lg:hover:bg-zinc-700/50 transition-all user-select-none lg:rounded border-t first-of-type:border-t-0 lg:border-t-0 border-gray-700 pt-3 first-of-type:pt-0 p-3 lg:p-4 lg:first-of-type:p-4 mb-3" data-id="<%= element.id %>">
+        <span class="transaction-info hidden" data-fee="<%= element.fee / 1000000 %>" data-amount="<%= element.amount / 1000000 %>" data-type="<%= element.type %>" data-timestamp="<%= element.date %>" data-sender="<%= element.sender %>" data-recipient="<%= element.recipient %>"></span>
+        <% var transactionColor = element.type === 'in' ? 'text-green-200' : 'text-red-300' %>
+        <svg role="img" class="icon <%= transactionColor %> flex-shrink-0 h-8 w-8">
+            <use xlink:href="/img/sprite.svg#<%= element.type === 'in' ? 'icon-arrow-down-right-circle' : 'icon-arrow-up-right-circle' %>"></use>
         </svg>
-        <h2 class="font-medium text-lg text-gray-300 mb-1">Nothing to see here!</h2>
-        <p class="text-gray-400 text-sm">Make some transactions to fill this part.</p>
+        <div class="ml-3">
+            <strong class="transaction-type text-sm font-medium <%= transactionColor %>">
+                <%= element.type === 'in' ? 'Received' : 'Sent' %>
+            </strong>
+            <%
+                var destinationType = element.type === 'in' ? 'From' : 'To'
+                var destination = element.type === 'in' ? element.sender : element.recipient
+            %>
+            <small class="block text-xs font-light" title="<%= destination %>">
+                <span class="destination-text"><%= destinationType %></span>:
+                <span class="destination-address"><%= `${destination.substr(0, 7)}...${destination.substr(destination.length - 7, 7)}` %></span>
+            </small>
+        </div>
+        <span class="text-sm ml-auto">
+            <span class="destination-symbol"><%= element.type === 'in' ? '+' : '-' %></span>
+            <span class="transaction-amount"><%= element.amount / 1000000 %></span>
+            ALGO
+        </span>
     </div>
+    <% }) %>
+    <% if(transactions.length === 50 && transactions.next) { %>
+    <button id="load-more-btn" data-next="<%= transactions.next %>"
+        class="bg-gray-500 hover:bg-gray-600 active:bg-gray-600/50 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-wait rounded transition-all px-5 py-2 mt-4 lg:mt-0 mx-auto">
+        Load more
+    </button>
+    <% } %>
+    <% } else { %>
+        <!-- EMPTY STATE -->
+        <div id="transactions-empty-state"
+            class="lg:bg-gray-700/25 rounded-lg flex flex-col items-center justify-center p-12 lg:my-auto">
+            <svg role="img" class="text-gray-400 animate-pulse h-10 w-10 mb-4">
+                <use xlink:href="/img/sprite.svg#icon-bricks"></use>
+            </svg>
+            <h2 class="font-medium text-lg text-gray-300 mb-1">Nothing to see here!</h2>
+            <p class="text-gray-400 text-sm">Make some transactions to fill this part.</p>
+        </div>
+    <% } %>
 </main>
-
+<!-- TRANSACTION TEMPLATE -->
+<template id="transaction-template">
+    <div class="transaction-wrapper cursor-pointer flex items-center flex-shrink-0 lg:bg-zinc-700/25 lg:rounded lg:p-4 mb-3">
+        <span class="transaction-info hidden" data-fee="" data-amount="" data-type="" data-timestamp="" data-sender="" data-recipient=""></span>
+        <svg role="img" class="icon flex-shrink-0 h-8 w-8">
+            <use xlink:href=""></use>
+        </svg>
+        <div class="ml-3">
+            <strong class="transaction-type text-sm font-medium [TRANSACTION-COLOR]"></strong>
+            <small class="block text-xs font-light" title="[DESTINATION-ADDRESS]">
+                <span class="destination-text"></span>: 
+                <span class="destination-address"></span>
+            </small>
+        </div>
+        <span class="text-sm ml-auto">
+            <span class="destination-symbol"></span>
+            <span class="transaction-amount"></span>
+            ALGO
+        </span>
+    </div>
+</template>
+<!-- MODAL -->
+<div id="modal" class="fixed w-full h-full top-0 left-0 bg-slate-900/75 backdrop-blur-sm invisible opacity-0 transition-opacity duration-300 flex justify-center items-start">
+    <div class="modal-content bg-gray-700 w-full lg:w-1/3 mt-auto lg:mt-24 max-h-[75%] lg:max-h-max rounded-t-xl lg:rounded overflow-y-auto translate-y-12 lg:translate-y-4 transition-transform duration-300">
+        <div class="grid grid-rows-modal lg:block px-6 pb-6">
+            <header class="flex items-center justify-between bg-gray-700 sticky top-0 py-4">
+                <h2 class="font-bold">Transaction details</h2>
+                <button id="close-modal-btn" class="bg-gray-600 hover:bg-gray-600/50 active:bg-gray-600/25 rounded-full p-1">
+                    <svg role="img" class="icon flex-shrink-0 h-6 w-6">
+                        <use xlink:href="/img/sprite.svg#icon-x"></use>
+                    </svg>
+                </button>
+            </header>
+            <div class="">
+                <ul class="bg-gray-600 rounded text-sm">
+                    <li class="flex items-center justify-between border-b border-gray-500/50 px-4 py-3">
+                        <span class="block text-gray-400 mb-1">Type:</span>
+                        <span class="modal-transaction-type block break-words"></span>
+                    </li>
+                    <li class="flex items-center justify-between border-b border-gray-500/50 px-4 py-3">
+                        <span class="block text-gray-400 mb-1">Amount:</span>
+                        <span class="modal-transaction-amount block break-words"></span>
+                    </li>
+                    <li class="flex items-center justify-between border-b border-gray-500/50 px-4 py-3">
+                        <span class="block text-gray-400 mb-1">Transaction fee:</span>
+                        <span class="modal-transaction-fee block break-words"></span>
+                    </li>
+                    <li class="flex items-center justify-between border-b border-gray-500/50 px-4 py-3">
+                        <span class="block text-gray-400 mb-1">Timestamp:</span>
+                        <span class="modal-transaction-timestamp block break-words"></span>
+                    </li>
+                    <li class="border-b border-gray-500/50 px-4 py-3">
+                        <span class="block text-gray-400 mb-1">From:</span>
+                        <div class="grid grid-cols-10 items-center">
+                            <span class="modal-transaction-sender copy-target col-start-1 col-end-9 block break-words"></span>
+                            <button class="copy-btn col-start-9 col-end-11 hover:bg-gray-700/50 active:bg-gray-600/25 rounded p-2 ml-auto" title="Copy">
+                                <svg role="img" class="icon flex-shrink-0 h-4 w-4">
+                                    <use xlink:href="/img/sprite.svg#icon-clipboard"></use>
+                                </svg>
+                            </button>
+                        </div>
+                    </li>
+                    <li class="border-b border-gray-500/50 px-4 py-3">
+                        <span class="block text-gray-400 mb-1">To:</span>
+                        <div class="grid grid-cols-10 items-center">
+                            <span class="modal-transaction-recipient copy-target col-start-1 col-end-9 block break-words"></span>
+                            <button class="copy-btn col-start-9 col-end-11 hover:bg-gray-700/50 active:bg-gray-600/25 rounded p-2 ml-auto" title="Copy">
+                                <svg role="img" class="icon flex-shrink-0 h-4 w-4">
+                                    <use xlink:href="/img/sprite.svg#icon-clipboard"></use>
+                                </svg>
+                            </button>
+                        </div>
+                    </li>
+                    <li class="px-4 py-3">
+                        <span class="block text-gray-400 mb-1">Transaction ID:</span>
+                        <div class="grid grid-cols-10 items-center">
+                            <span class="modal-transaction-txid copy-target col-start-1 col-end-9 block break-words"></span>
+                            <button class="copy-btn col-start-9 col-end-11 hover:bg-gray-700/50 active:bg-gray-600/25 rounded p-2 ml-auto" title="Copy">
+                                <svg role="img" class="icon flex-shrink-0 h-4 w-4">
+                                    <use xlink:href="/img/sprite.svg#icon-clipboard"></use>
+                                </svg>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 <%- include('layout/login-foot.ejs') %>
 
 <script>
-
+    // Load more transactions
+    function loadMore(btn) {
+        var next = btn.getAttribute('data-next')
+        btn.setAttribute('disabled', 'disabled')
+        axios({
+            method: 'get',
+            url: `/api/wallet/transactions?wallet=<%= wallet %>&limit=50${next ? `&next=${next}` : ''}`,
+        })
+            .then(function (response) {
+                var transactions = response.data.data.data
+                btn.removeAttribute('disabled')
+                btn.classList.add('hidden')
+                if (transactions.length > 0) {
+                    transactions.forEach(element => {
+                        var transactionType = element.type === 'in' ? 'Received' : 'Sent'
+                        var destinationAddress = element.type === 'in' ? element.sender : element.recipient
+                        var formattedDestinationAddress = `${destinationAddress.substr(0, 7)}...${destinationAddress.substr(destinationAddress.length - 7, 7)}`
+                        var transactionId = element.id
+                        var template = document.getElementById('transaction-template')
+                        var clone = template.content.cloneNode(true)
+                        clone.querySelector('.transaction-wrapper').setAttribute('data-id', transactionId)
+                        clone.querySelector('.icon').classList.add(element.type === 'in' ? 'text-green-200' : 'text-red-300')
+                        clone.querySelector('.icon use').setAttribute('xlink:href', `/img/sprite.svg#${element.type === 'in' ? 'icon-arrow-down-right-circle' : 'icon-arrow-up-right-circle'}`)
+                        clone.querySelector('.transaction-type').innerText = element.type === 'in' ? 'Received' : 'Sent'
+                        clone.querySelector('.destination-text').innerText = element.type === 'in' ? 'From' : 'To'
+                        clone.querySelector('.destination-address').innerText = formattedDestinationAddress
+                        clone.querySelector('.destination-symbol').innerText = element.type === 'in' ? '+' : '-'
+                        clone.querySelector('.transaction-amount').innerText = element.amount / 1000000
+                        clone.querySelector('.transaction-info').setAttribute('data-fee', element.fee / 1000000)
+                        clone.querySelector('.transaction-info').setAttribute('data-amount', element.amount / 1000000)
+                        clone.querySelector('.transaction-info').setAttribute('data-type', element.type)
+                        clone.querySelector('.transaction-info').setAttribute('data-timestamp', element.date)
+                        clone.querySelector('.transaction-info').setAttribute('data-sender', element.sender)
+                        clone.querySelector('.transaction-info').setAttribute('data-recipient', element.recipient)
+                        clone.querySelector('.transaction-info').setAttribute('data-fee', element.fee)
+                        clone.querySelector('.transaction-wrapper').addEventListener('click', function() {
+                            transactionModal(transactionId)
+                        })
+                        document.getElementById('transactions-container').appendChild(clone)
+                    })
+                    var clonedBtn = btn.cloneNode(true)
+                    if(transactions.length === 50) {
+                        clonedBtn.classList.remove('hidden')
+                        clonedBtn.setAttribute('data-next', response.data.data.next)
+                        clonedBtn.addEventListener('click', function() {
+                            loadMore(clonedBtn)
+                        })
+                        document.getElementById('transactions-container').appendChild(clonedBtn)
+                    }
+                    btn.remove()
+                } else {
+                    var emptyMessage = document.createElement('div')
+                    emptyMessage.innerHTML = 'No more transactions to show.'
+                    emptyMessage.classList.add('text-center', 'text-gray-400', 'text-sm', 'my-4')
+                    // emptyMessage = emptyMessage.firstChild
+                    document.getElementById('transactions-container').appendChild(emptyMessage)
+                }
+            })
+            .catch(function(err) {
+                notyf.error('An error has occured!')
+            })
+    }
+    var loadMoreBtn = document.getElementById('load-more-btn')
+    if(loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', function() {
+            loadMore(this)
+        })
+    }
+    // Transaction information
+    function transactionModal(txid) {
+        var modal = document.getElementById('modal')
+        modal.classList.remove('invisible')
+        modal.classList.remove('opacity-0')
+        modal.querySelector('.modal-content').classList.remove('translate-y-12', 'lg:translate-y-4')
+        modal.classList.add('flex')
+        var transactionInfoElem = document.querySelector('.transaction-wrapper[data-id="' + txid + '"] .transaction-info')
+        var transactionInfo = {
+            txid: txid,
+            fee: transactionInfoElem.getAttribute('data-fee'),
+            amount: transactionInfoElem.getAttribute('data-amount'),
+            type: transactionInfoElem.getAttribute('data-type'),
+            sender: transactionInfoElem.getAttribute('data-sender'),
+            recipient: transactionInfoElem.getAttribute('data-recipient'),
+            timestamp: transactionInfoElem.getAttribute('data-timestamp'),
+        }
+        modal.querySelector('.modal-transaction-type').innerText = transactionInfo.type === 'in' ? 'Incoming' : 'Outgoing'
+        modal.querySelector('.modal-transaction-amount').innerText = transactionInfo.amount + ' ALGO'
+        modal.querySelector('.modal-transaction-fee').innerText = transactionInfo.fee
+        modal.querySelector('.modal-transaction-timestamp').innerText = new Date(transactionInfo.timestamp * 1000).toLocaleString()
+        modal.querySelector('.modal-transaction-sender').innerText = transactionInfo.sender
+        modal.querySelector('.modal-transaction-recipient').innerText = transactionInfo.recipient
+        modal.querySelector('.modal-transaction-txid').innerText = txid
+    }
+    // Close transaction modal
+    function closeTransactionModal() {
+        var modal = document.getElementById('modal')
+        modal.classList.add('opacity-0')
+        modal.querySelector('.modal-content').classList.add('translate-y-12', 'lg:translate-y-4')
+        setTimeout(function() {
+            modal.classList.add('invisible')
+            modal.classList.remove('flex')
+        }, 300)
+    }
+    var transactions = document.querySelectorAll('.transaction-wrapper')
+    transactions.forEach(element => {
+        element.addEventListener('click', function() {
+            transactionModal(element.getAttribute('data-id'))
+        })
+    })
+    document.getElementById('close-modal-btn').addEventListener('click', function() {
+        closeTransactionModal()
+    })
+    // Close transaction modal on click outside
+    document.getElementById('modal').addEventListener('click', function(e) {
+        if(e.target === this) {
+            closeTransactionModal()
+        }
+    })
+    // Copy to clipboard
+    document.querySelectorAll('button.copy-btn').forEach(element => {
+        element.addEventListener('click', function() {
+            var text = this.parentElement.querySelector('.copy-target').innerText
+            var dummy = document.createElement('input')
+            document.body.appendChild(dummy)
+            dummy.setAttribute('value', text)
+            dummy.select()
+            document.execCommand('copy')
+            document.body.removeChild(dummy)
+            notyf.success('Copied to clipboard!')
+        })
+    })
 </script>

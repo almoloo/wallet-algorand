@@ -42,7 +42,6 @@ router.post('/register', async (req, res) => {
 			const accessToken = jwt.sign(userObject, process.env.TOKEN_SECRET)
 			res
 				.cookie('account', accessToken, { maxAge: 2600000000, httpOnly: true })
-				.cookie('testnet', '1', { maxAge: 26000000000, httpOnly: true })
 				.json({
 					success: true,
 					message: 'User created.',

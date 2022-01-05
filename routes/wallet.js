@@ -2,7 +2,9 @@ const express = require('express')
 const router = express.Router()
 const authenticateToken = require('../middlewares/auth')
 const usersCollection = require('../middlewares/db')
+const getTransactions = require('../middlewares/gettransactions')
 const Tatum = require('@tatumio/tatum')
+const { default: axios } = require('axios')
 
 // ----- GET USER BALANCE
 router.get('/balance', authenticateToken, async (req, res) => {
@@ -11,32 +13,43 @@ router.get('/balance', authenticateToken, async (req, res) => {
 		.where('username', '==', req.user.username)
 		.get()
 	const rawUserData = user.docs[0].data()
-	const accountBalance = await Tatum.algorandGetAccountBalance(
-		rawUserData.wallet.address
-	)
-	res.json({
-		success: true,
-		data: {
-			amount: accountBalance,
-			unit: 1,
-			fee: 0,
-		},
-	})
+	try {
+		const accountBalance = await Tatum.algorandGetAccountBalance(
+			rawUserData.wallet.address
+		)
+		if (accountBalance.error) throw accountBalance.error
+		res.json({
+			success: true,
+			data: {
+				amount: accountBalance,
+				unit: 1,
+				fee: 0,
+			},
+		})
+	} catch (err) {
+		res.status(403).json({
+			success: false,
+			message: err,
+		})
+	}
 })
 
 // ----- GET USER TRANSACTIONS
 router.get('/transactions', authenticateToken, async (req, res) => {
-	// console.log(req.cookies.testnet)
-	const user = await usersCollection
-		.where('username', '==', req.user.username)
-		.get()
-	const rawUserData = user.docs[0].data()
-	// console.log(Tatum)
-	// res.json(rawUserData)
-	const transactions = await Tatum.algorandGetTransactionsCount(
-		rawUserData.wallet.address
-	)
-	res.send(transactions)
+	const next = req.query.next
+	const wallet = req.query.wallet
+	try {
+		const transactions = await getTransactions(wallet, 50, next)
+		res.json({
+			success: true,
+			data: transactions,
+		})
+	} catch (err) {
+		res.status(403).json({
+			success: false,
+			message: err,
+		})
+	}
 })
 
 module.exports = router
