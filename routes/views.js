@@ -3,6 +3,8 @@ const router = express.Router()
 const jwt = require('jsonwebtoken')
 const usersCollection = require('../middlewares/db')
 const getTransactions = require('../middlewares/gettransactions')
+const getBalance = require('../middlewares/getbalance')
+const getPrice = require('../middlewares/getprice')
 const { default: axios } = require('axios')
 const QRCode = require('qrcode')
 
@@ -22,10 +24,19 @@ router.get('/', (req, res) => {
 				const transactions = await getTransactions(
 					userDB.docs[0].data().wallet.address
 				)
+				const balance = await getBalance(userDB.docs[0].data().wallet.address)
+				const coinInfo = await getPrice()
+				if (!coinInfo.success) throw new Error(coinInfo.message)
+				const price = coinInfo.data['market_data']['current_price']['usd']
+				const priceChange =
+					coinInfo.data['market_data']['price_change_percentage_24h']
 				res.render('dashboard', {
 					transactions: transactions,
 					wallet: userDB.docs[0].data().wallet.address,
-					qr: await QRCode.toDataURL(userDB.docs[0].data().wallet.address)
+					qr: await QRCode.toDataURL(userDB.docs[0].data().wallet.address),
+					balance: balance,
+					price: price,
+					priceChange: priceChange,
 				})
 			})
 		} catch (err) {

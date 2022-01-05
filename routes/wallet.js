@@ -3,21 +3,22 @@ const router = express.Router()
 const authenticateToken = require('../middlewares/auth')
 const usersCollection = require('../middlewares/db')
 const getTransactions = require('../middlewares/gettransactions')
+const getBalance = require('../middlewares/getbalance')
 const Tatum = require('@tatumio/tatum')
-const { default: axios } = require('axios')
 
 // ----- GET USER BALANCE
 router.get('/balance', authenticateToken, async (req, res) => {
-	// GET USER DATA FROM DATABASE
 	const user = await usersCollection
-		.where('username', '==', req.user.username)
-		.get()
+	.where('username', '==', req.user.username)
+	.get()
 	const rawUserData = user.docs[0].data()
-	try {
-		const accountBalance = await Tatum.algorandGetAccountBalance(
-			rawUserData.wallet.address
-		)
-		if (accountBalance.error) throw accountBalance.error
+	const balance = await getBalance(rawUserData.wallet.address)
+	if (balance === NaN) {
+		res.status(403).json({
+			success: false,
+			message: 'Error getting balance',
+		})
+	} else {
 		res.json({
 			success: true,
 			data: {
@@ -25,11 +26,6 @@ router.get('/balance', authenticateToken, async (req, res) => {
 				unit: 1,
 				fee: 0,
 			},
-		})
-	} catch (err) {
-		res.status(403).json({
-			success: false,
-			message: err,
 		})
 	}
 })
