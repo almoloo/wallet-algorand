@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const usersCollection = require('../middlewares/db')
 const getTransactions = require('../middlewares/gettransactions')
 const { default: axios } = require('axios')
+const QRCode = require('qrcode')
 
 // ----- Welcome
 router.get('/', (req, res) => {
@@ -24,6 +25,7 @@ router.get('/', (req, res) => {
 				res.render('dashboard', {
 					transactions: transactions,
 					wallet: userDB.docs[0].data().wallet.address,
+					qr: await QRCode.toDataURL(userDB.docs[0].data().wallet.address)
 				})
 			})
 		} catch (err) {
