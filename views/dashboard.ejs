@@ -12,7 +12,7 @@
             </a>
         </div>
         <div class="flex justify-between items-start">
-            <div>
+            <div class="mr-auto">
                 <strong class="text-white text-3xl" id="wallet-balance"><%= balance %></strong>
                 <small class="text-gray-300 ml-1">ALGO</small>
                 <div>
@@ -35,17 +35,9 @@
         </div>
     </div>
     <!-- LOGOUT BUTTON -->
-    <div class="bg-gray-700 lg:rounded-lg p-8 hidden lg:block">
-        <h1 class="font-bold mb-6">Navigation</h1>
-        <ul>
-            <li>
-                <a href="#">Admin panel</a>
-            </li>
-            <li>
-                <a href="#">Logout</a>
-            </li>
-        </ul>
-    </div>
+    <a href="/api/account/logout" class="hidden lg:block bg-gray-700 hover:bg-gray-600 active:bg-gray-600/50 rounded transition-all w-full text-center px-3 pt-3 pb-4">
+        <span>Logout</span>
+    </a>
 </aside>
 <main class="flex flex-col">
     <h1 id="transactions-heading" class="font-bold hidden lg:block">Transactions</h1>
