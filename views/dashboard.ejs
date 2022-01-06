@@ -5,7 +5,7 @@
     <div class="bg-gray-700 lg:rounded-lg p-8 lg:mb-6">
         <div class="flex lg:hidden items-center justify-between mb-6">
             <h1 class="font-bold">My wallet</h1>
-            <button id="refresh-btn" class="hover:text-gray-400 bg-gray-800 rounded-full p-3">
+            <button id="logout-btn" class="hover:text-gray-400 bg-gray-800 rounded-full p-3">
                 <svg role="img" class="h-4 w-4">
                     <use xlink:href="/img/sprite.svg#icon-gear-fill"></use>
                 </svg>
@@ -13,11 +13,11 @@
         </div>
         <div class="flex justify-between items-start">
             <div>
-                <strong class="text-white text-3xl"><%= balance %></strong>
+                <strong class="text-white text-3xl" id="wallet-balance"><%= balance %></strong>
                 <small class="text-gray-300 ml-1">ALGO</small>
                 <div>
-                    <small class="text-gray-300 mt-1">$<%= (price * balance).toFixed(2) %></small>
-                    <small class="<%= priceChange.toString()[0] === '+' ? 'text-green-200' : 'text-red-300'  %> ml-1"><%= priceChange.toFixed(2) %>%</small>
+                    <small class="text-gray-300 mt-1" id="wallet-balance-usd">$<%= (price * balance).toFixed(2) %></small>
+                    <small class="<%= priceChange.toString()[0] === '+' ? 'text-green-200' : 'text-red-300'  %> ml-1" id="wallet-price-change"><%= priceChange.toFixed(2) %>%</small>
                 </div>
             </div>
             <button id="refresh-btn"
@@ -200,7 +200,7 @@
     </div>
 </div>
 <!-- RECEIVE MODAL  -->
-<div id="receive-modal" class="modal transaction-modal fixed w-full h-full top-0 left-0 bg-slate-900/75 backdrop-blur-sm invisible opacity-0 transition-opacity duration-300 flex justify-center items-start">
+<div id="receive-modal" class="modal fixed w-full h-full top-0 left-0 bg-slate-900/75 backdrop-blur-sm invisible opacity-0 transition-opacity duration-300 flex justify-center items-start">
     <div class="modal-content bg-gray-700 w-full lg:w-1/3 mt-auto lg:mt-24 max-h-[85%] lg:max-h-max rounded-t-xl lg:rounded overflow-y-auto translate-y-12 lg:translate-y-4 transition-transform duration-300">
         <div class="grid grid-rows-modal lg:block px-6 pb-6">
             <header class="flex items-center justify-between bg-gray-700 sticky z-10 top-0 py-4">
@@ -239,9 +239,65 @@
         </div>
     </div>
 </div>
+<!-- SEND MODAL -->
+<div id="send-modal" class="modal fixed w-full h-full top-0 left-0 bg-slate-900/75 backdrop-blur-sm invisible opacity-0 transition-opacity duration-300 flex justify-center items-start">
+    <div class="modal-content bg-gray-700 w-full lg:w-1/3 mt-auto lg:mt-24 max-h-[85%] lg:max-h-max rounded-t-xl lg:rounded overflow-y-auto translate-y-12 lg:translate-y-4 transition-transform duration-300">
+        <div class="grid grid-rows-modal lg:block px-6 pb-6">
+            <header class="flex items-center justify-between bg-gray-700 sticky z-10 top-0 py-4">
+                <h2 class="font-bold">Send Algorand</h2>
+                <button class="close-modal-btn bg-gray-600 hover:bg-gray-600/50 active:bg-gray-600/25 rounded-full p-1">
+                    <svg role="img" class="icon flex-shrink-0 h-6 w-6">
+                        <use xlink:href="/img/sprite.svg#icon-x"></use>
+                    </svg>
+                </button>
+            </header>
+            <div>
+                <div class="bg-gray-600 rounded-t p-4 pb-0">
+                    <form id="send-funds-form" class="flex flex-col">
+                        <input type="text" name="address" id="address-input"
+                            class="bg-white disabled:bg-gray-200 text-black rounded p-4 mb-3 focus:ring-inset"
+                            placeholder="Recipient address" spellcheck="false" required />
+                        <div class="relative mb-3">
+                            <input type="decimal" inputmode="decimal" name="amount" id="amount-input"
+                                class="bg-white disabled:bg-gray-200 text-black rounded w-full p-4 pr-16 focus:ring-inset"
+                                placeholder="ALGO amount" spellcheck="false" autocomplete="off" required />
+                            <button id="send-max-btn" type="button" class="text-blue-500 hover:text-blue-600 active:text-blue-700 absolute rounded top-0 bottom-0 right-0 m-1 px-4">Max</button>
+                        </div>
+                        <div class="flex justify-between items-center mb-3">
+                            <small id="send-funds-price" class="text-gray-400 mb-3">≈ $0.00</small>
+                            <small class="text-gray-400 mb-3">0.001 fee</small>
+                        </div>
+                        <button type="submit" id="send-submit-btn"
+                            class="bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:bg-gray-500 disabled:text-gray-400
+                            transition-all text-center rounded p-4 mb-3">
+                            Send
+                        </button>
+                    </form>
+                </div>
+                <div class="flex items-start bg-orange-300/25 text-orange-400 rounded-b text-xs leading-5 px-4 py-3">
+                    <svg role="img" class="icon flex-shrink-0 h-8 w-8">
+                        <use xlink:href="/img/sprite.svg#icon-exclamation-circle-fill"></use>
+                    </svg>
+                    <p class="ml-3 mb-0">
+                        You may only send funds to an Algorand network wallet address.
+                        Failure to do so will result in the loss of your funds.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <%- include('layout/login-foot.ejs') %>
 
 <script>
+    // State
+    var walletState = {
+        balance: <%= balance %>,
+        wallet: '<%= wallet %>',
+        price: <%= price %>,
+        priceChange: <%= priceChange %>,
+        lastTransaction: '<%= transactions.data[0].id %>',
+    }
     // Load more transactions
     function loadMore(btn) {
         var next = btn.getAttribute('data-next')
@@ -389,4 +445,160 @@
     document.getElementById('receive-btn').addEventListener('click', function() {
         showModal('receive-modal')
     })
+    // Show send modal
+    document.getElementById('send-btn').addEventListener('click', function() {
+        showModal('send-modal')
+    })
+    // Send funds
+    document.getElementById('amount-input').addEventListener('input', function() {
+        var submitBtn = document.getElementById('send-submit-btn')
+        var amount = this.value
+        var calculatedPrice = walletState.price * amount
+        document.getElementById('send-funds-price').textContent = `≈ $${calculatedPrice.toFixed(2)}`
+        if(amount > walletState.balance) {
+            submitBtn.setAttribute('disabled', 'disabled')
+        } else {
+            submitBtn.removeAttribute('disabled')
+        }
+    })
+    document.getElementById('send-max-btn').addEventListener('click', function() {
+        var amount = walletState.balance
+        document.getElementById('amount-input').value = amount
+        document.getElementById('amount-input').dispatchEvent(new Event('input'))
+    })
+    document.getElementById('send-funds-form').addEventListener('submit', function(e) {
+        e.preventDefault()
+        var amount = document.getElementById('amount-input')
+        var address = document.getElementById('address-input')
+        var submitBtn = document.getElementById('send-submit-btn')
+        submitBtn.setAttribute('disabled', 'disabled')
+        amount.setAttribute('disabled', 'disabled')
+        address.setAttribute('disabled', 'disabled')
+        submitBtn.classList.remove('cursor-pointer')
+        var data = {
+            amount: amount.value,
+            address: address.value,
+            username: '<%= username %>',
+        }
+        axios({
+            method: 'post',
+            url: `/api/wallet/send`,
+            data: data
+        })
+            .then(function(response) {
+                console.log(response)
+                if(response.data.success) {
+                    notyf.success('Sent!')
+                    closeModal(document.getElementById('send-modal'))
+                    document.getElementById('send-funds-form').reset()
+                    document.getElementById('send-funds-price').textContent = '0.00'
+                } else {
+                    notyf.error('Error has occured!')
+                    submitBtn.removeAttribute('disabled')
+                    amount.removeAttribute('disabled')
+                    address.removeAttribute('disabled')
+                    submitBtn.classList.add('cursor-pointer')
+                }
+            })
+            .catch(function(error) {
+                submitBtn.removeAttribute('disabled')
+                amount.removeAttribute('disabled')
+                address.removeAttribute('disabled')
+                submitBtn.classList.add('cursor-pointer')
+                notyf.error(error.response.data.message)
+            })
+    })
+    // Refresh wallet
+    document.getElementById('refresh-btn').addEventListener('click', function() {
+        refreshWallet()
+    })
+    function refreshWallet() {
+        var newState = {
+            balance: null,
+            price: null,
+            priceChange: null,
+            lastTransaction: null,
+        }
+        // Disable refresh button
+        var refreshBtn = document.getElementById('refresh-btn')
+        refreshBtn.setAttribute('disabled', 'disabled')
+        refreshBtn.classList.remove('cursor-pointer')
+        refreshBtn.classList.add('animate-spin')
+        // Get wallet balance
+        var getBalance = axios({
+            method: 'get',
+            url: `/api/wallet/balance`
+        })
+            .then(function(response) {
+                if(response.data.success) {
+                    newState.balance = response.data.data.amount
+                    return response.data.data.amount
+                } else {
+                    throw 'errBalance'
+                }
+            })
+            .catch(function(error) {
+                throw error
+            })
+        // Get price
+        var getPrice = axios({
+            method: 'get',
+            url: `/api/wallet/price`
+        })
+            .then(function(response) {
+                if(response.data.success) {
+                    newState.price = response.data.data.price
+                    newState.priceChange = response.data.data.priceChange
+                    return response.data.data
+                } else {
+                    throw 'errPrice'
+                }
+            })
+            .catch(function(error) {
+                throw error
+            })
+        // Get last transaction
+        var getLastTransaction = axios({
+            method: 'get',
+            url: `/api/wallet/transactions?wallet=${walletState.wallet}`
+        })
+            .then(function(response) {
+                if(response.data.success) {
+                    newState.lastTransaction = response.data.data.data[0].id
+                    return response.data.data.data[0]
+                } else {
+                    throw 'errLastTransaction'
+                }
+            })
+            .catch(function(error) {
+                throw error
+            })
+        Promise.all([getBalance, getPrice, getLastTransaction])
+            .then(function(responses) {
+                // Change balance & price
+                document.getElementById('wallet-balance').textContent = `${newState.balance}`
+                document.getElementById('wallet-balance-usd').textContent = `$${(newState.balance * newState.price).toFixed(2)}`
+                document.getElementById('wallet-price-change').textContent = `${newState.priceChange.toFixed(2)}%`
+                document.getElementById('wallet-price-change').classList.remove('text-green-200', 'text-red-300')
+                if(newState.priceChange > 0) {
+                    document.getElementById('wallet-price-change').classList.add('text-green-200')
+                } else {
+                    document.getElementById('wallet-price-change').classList.add('text-red-300')
+                }
+                // Check last transaction
+                if(newState.lastTransaction !== walletState.lastTransaction) {
+                    notyf.success('New transaction!')
+                }
+                // Enable refresh button
+                refreshBtn.removeAttribute('disabled')
+                refreshBtn.classList.add('cursor-pointer')
+                refreshBtn.classList.remove('animate-spin')
+            })
+            .catch(function(errors) {
+                refreshBtn.removeAttribute('disabled')
+                refreshBtn.classList.add('cursor-pointer')
+                refreshBtn.classList.remove('animate-spin')
+                notyf.error('An error has occured!')
+            })
+    }
 </script>
