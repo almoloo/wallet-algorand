@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "A custodial Algorand wallet using Tatum's API.",
   "main": "index.js",
+  "engines": {
+    "node": "16.x"
+  },
   "scripts": {
     "dev": "nodemon index.js",
     "css": "npx tailwindcss -i ./wwwroot/styles/src.style.css -o ./wwwroot/styles/style.css --watch"
