@@ -5,11 +5,11 @@
     <div class="bg-gray-700 lg:rounded-lg p-8 lg:mb-6">
         <div class="flex lg:hidden items-center justify-between mb-6">
             <h1 class="font-bold">My wallet</h1>
-            <button id="logout-btn" class="hover:text-gray-400 bg-gray-800 rounded-full p-3">
+            <a href="/api/account/logout" id="logout-btn" class="hover:text-gray-400 bg-gray-800 rounded-full p-3">
                 <svg role="img" class="h-4 w-4">
-                    <use xlink:href="/img/sprite.svg#icon-gear-fill"></use>
+                    <use xlink:href="/img/sprite.svg#icon-box-arrow-left"></use>
                 </svg>
-            </button>
+            </a>
         </div>
         <div class="flex justify-between items-start">
             <div>
@@ -47,72 +47,74 @@
         </ul>
     </div>
 </aside>
-<main class="flex flex-col" id="transactions-container">
-    <h1 class="font-bold hidden lg:block">Transactions</h1>
-    <% if (transactions.data.length > 0) { %>
-    <!-- TRANSACTIONS -->
-    <%
-        var lastDate = null
-        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    %>
-    <% transactions.data.forEach(element => { %>
-    <%
-        var currentDateObj = new Date(element.date * 1000)
-        var currentFullDate = currentDateObj.toLocaleDateString()
-        var currentDisplayDate = `${months[currentFullDate.split('/')[0] - 1]} ${currentFullDate.split('/')[1]} ${currentFullDate.split('/')[2]}`
-    %>
-    <% if (lastDate !== currentDisplayDate) { %>
-    <small
-        class="inline-block bg-zinc-700 rounded-full text-zinc-300 text-xs mx-auto px-4 py-1 my-4 lg:my-3"><%= currentDisplayDate %></small>
-    <% lastDate = currentDisplayDate %>
-    <% } %>
-    <div class="transaction-wrapper cursor-pointer flex items-center flex-shrink-0 lg:bg-zinc-700/25 lg:hover:bg-zinc-700/50 transition-all user-select-none lg:rounded border-t first-of-type:border-t-0 lg:border-t-0 border-gray-700 pt-3 first-of-type:pt-0 p-3 lg:p-4 lg:first-of-type:p-4 mb-3" data-id="<%= element.id %>">
-        <span class="transaction-info hidden" data-fee="<%= element.fee / 1000000 %>" data-amount="<%= element.amount / 1000000 %>" data-type="<%= element.type %>" data-timestamp="<%= element.date %>" data-sender="<%= element.sender %>" data-recipient="<%= element.recipient %>"></span>
-        <% var transactionColor = element.type === 'in' ? 'text-green-200' : 'text-red-300' %>
-        <svg role="img" class="icon <%= transactionColor %> flex-shrink-0 h-8 w-8">
-            <use xlink:href="/img/sprite.svg#<%= element.type === 'in' ? 'icon-arrow-down-right-circle' : 'icon-arrow-up-right-circle' %>"></use>
-        </svg>
-        <div class="ml-3">
-            <strong class="transaction-type text-sm font-medium <%= transactionColor %>">
-                <%= element.type === 'in' ? 'Received' : 'Sent' %>
-            </strong>
-            <%
-                var destinationType = element.type === 'in' ? 'From' : 'To'
-                var destination = element.type === 'in' ? element.sender : element.recipient
-            %>
-            <small class="block text-xs font-light" title="<%= destination %>">
-                <span class="destination-text"><%= destinationType %></span>:
-                <span class="destination-address"><%= `${destination.substr(0, 7)}...${destination.substr(destination.length - 7, 7)}` %></span>
-            </small>
-        </div>
-        <span class="text-sm ml-auto">
-            <span class="destination-symbol"><%= element.type === 'in' ? '+' : '-' %></span>
-            <span class="transaction-amount"><%= element.amount / 1000000 %></span>
-            ALGO
-        </span>
-    </div>
-    <% }) %>
-    <% if(transactions.length === 50 && transactions.next) { %>
-    <button id="load-more-btn" data-next="<%= transactions.next %>"
-        class="bg-gray-500 hover:bg-gray-600 active:bg-gray-600/50 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-wait rounded transition-all px-5 py-2 mt-4 lg:mt-0 mx-auto">
-        Load more
-    </button>
-    <% } %>
-    <% } else { %>
-        <!-- EMPTY STATE -->
-        <div id="transactions-empty-state"
-            class="lg:bg-gray-700/25 rounded-lg flex flex-col items-center justify-center p-12 lg:my-auto">
-            <svg role="img" class="text-gray-400 animate-pulse h-10 w-10 mb-4">
-                <use xlink:href="/img/sprite.svg#icon-bricks"></use>
+<main class="flex flex-col">
+    <h1 id="transactions-heading" class="font-bold hidden lg:block">Transactions</h1>
+    <div class="flex flex-col" id="transactions-container">
+        <% if (transactions.data.length > 0) { %>
+        <!-- TRANSACTIONS -->
+        <%
+            var lastDate = null
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        %>
+        <% transactions.data.forEach(element => { %>
+        <%
+            var currentDateObj = new Date(element.date * 1000)
+            var currentFullDate = currentDateObj.toLocaleDateString()
+            var currentDisplayDate = `${months[currentFullDate.split('/')[0] - 1]} ${currentFullDate.split('/')[1]} ${currentFullDate.split('/')[2]}`
+        %>
+        <% if (lastDate !== currentDisplayDate) { %>
+        <small
+            class="date-elem inline-block bg-zinc-700 rounded-full text-zinc-300 text-xs mx-auto px-4 py-1 my-4 lg:my-3"><%= currentDisplayDate %></small>
+        <% lastDate = currentDisplayDate %>
+        <% } %>
+        <div class="transaction-wrapper cursor-pointer flex items-center flex-shrink-0 lg:bg-zinc-700/25 lg:hover:bg-zinc-700/50 transition-all user-select-none lg:rounded border-t first-of-type:border-t-0 lg:border-t-0 border-gray-700 pt-3 first-of-type:pt-0 p-3 lg:p-4 lg:first-of-type:p-4 mb-3" data-id="<%= element.id %>">
+            <span class="transaction-info hidden" data-fee="<%= element.fee / 1000000 %>" data-amount="<%= element.amount / 1000000 %>" data-type="<%= element.type %>" data-timestamp="<%= element.date %>" data-sender="<%= element.sender %>" data-recipient="<%= element.recipient %>"></span>
+            <% var transactionColor = element.type === 'in' ? 'text-green-200' : 'text-red-300' %>
+            <svg role="img" class="icon <%= transactionColor %> flex-shrink-0 h-8 w-8">
+                <use xlink:href="/img/sprite.svg#<%= element.type === 'in' ? 'icon-arrow-down-right-circle' : 'icon-arrow-up-right-circle' %>"></use>
             </svg>
-            <h2 class="font-medium text-lg text-gray-300 mb-1">Nothing to see here!</h2>
-            <p class="text-gray-400 text-sm">Make some transactions to fill this part.</p>
+            <div class="ml-3">
+                <strong class="transaction-type text-sm font-medium <%= transactionColor %>">
+                    <%= element.type === 'in' ? 'Received' : 'Sent' %>
+                </strong>
+                <%
+                    var destinationType = element.type === 'in' ? 'From' : 'To'
+                    var destination = element.type === 'in' ? element.sender : element.recipient
+                %>
+                <small class="block text-xs font-light" title="<%= destination %>">
+                    <span class="destination-text"><%= destinationType %></span>:
+                    <span class="destination-address"><%= `${destination.substr(0, 7)}...${destination.substr(destination.length - 7, 7)}` %></span>
+                </small>
+            </div>
+            <span class="text-sm ml-auto">
+                <span class="destination-symbol"><%= element.type === 'in' ? '+' : '-' %></span>
+                <span class="transaction-amount"><%= element.amount / 1000000 %></span>
+                ALGO
+            </span>
         </div>
-    <% } %>
+        <% }) %>
+        <% if(transactions.length === 50 && transactions.next) { %>
+        <button id="load-more-btn" data-next="<%= transactions.next %>"
+            class="bg-gray-500 hover:bg-gray-600 active:bg-gray-600/50 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-wait rounded transition-all px-5 py-2 mt-4 lg:mt-0 mx-auto">
+            Load more
+        </button>
+        <% } %>
+        <% } else { %>
+            <!-- EMPTY STATE -->
+            <div id="transactions-empty-state"
+                class="lg:bg-gray-700/25 rounded-lg flex flex-col items-center justify-center p-12 lg:my-auto">
+                <svg role="img" class="text-gray-400 animate-pulse h-10 w-10 mb-4">
+                    <use xlink:href="/img/sprite.svg#icon-bricks"></use>
+                </svg>
+                <h2 class="font-medium text-lg text-gray-300 mb-1">Nothing to see here!</h2>
+                <p class="text-gray-400 text-sm">Make some transactions to fill this part.</p>
+            </div>
+        <% } %>
+    </div>
 </main>
 <!-- TRANSACTION TEMPLATE -->
 <template id="transaction-template">
-    <div class="transaction-wrapper cursor-pointer flex items-center flex-shrink-0 lg:bg-zinc-700/25 lg:rounded lg:p-4 mb-3">
+    <div class="transaction-wrapper cursor-pointer flex items-center flex-shrink-0 lg:bg-zinc-700/25 lg:hover:bg-zinc-700/50 transition-all user-select-none lg:rounded border-t first-of-type:border-t-0 lg:border-t-0 border-gray-700 pt-3 first-of-type:pt-0 p-3 lg:p-4 lg:first-of-type:p-4 mb-3">
         <span class="transaction-info hidden" data-fee="" data-amount="" data-type="" data-timestamp="" data-sender="" data-recipient=""></span>
         <svg role="img" class="icon flex-shrink-0 h-8 w-8">
             <use xlink:href=""></use>
@@ -300,18 +302,39 @@
     }
     // Load more transactions
     function loadMore(btn) {
-        var next = btn.getAttribute('data-next')
-        btn.setAttribute('disabled', 'disabled')
+        if(btn) {
+            var next = btn.getAttribute('data-next')
+            btn.setAttribute('disabled', 'disabled')
+        }
         axios({
             method: 'get',
             url: `/api/wallet/transactions?wallet=<%= wallet %>&limit=50${next ? `&next=${next}` : ''}`,
         })
             .then(function (response) {
+                if(btn) {
+                    btn.removeAttribute('disabled')
+                    btn.classList.add('hidden')
+                }
                 var transactions = response.data.data.data
-                btn.removeAttribute('disabled')
-                btn.classList.add('hidden')
+                var lastDate = null
+                var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
                 if (transactions.length > 0) {
+                    // Remove all existing transactions
+                    var transactionsContainer = document.getElementById('transactions-container')
+                    while (transactionsContainer.lastChild) {
+                        transactionsContainer.removeChild(transactionsContainer.firstChild)
+                    }
                     transactions.forEach(element => {
+                        var currentDateObj = new Date(element.date * 1000)
+                        var currentFullDate = currentDateObj.toLocaleDateString()
+                        var currentDisplayDate = `${months[currentFullDate.split('/')[0] - 1]} ${currentFullDate.split('/')[1]} ${currentFullDate.split('/')[2]}`
+                        if (lastDate !== currentDisplayDate) {
+                            var dateSmall = document.createElement('small')
+                            dateSmall.classList.add('inline-block', 'bg-zinc-700', 'rounded-full', 'text-zinc-300', 'text-xs', 'mx-auto', 'px-4', 'py-1', 'my-4', 'lg:my-3')
+                            dateSmall.innerHTML = currentDisplayDate
+                            document.getElementById('transactions-container').appendChild(dateSmall)
+                            lastDate = currentDisplayDate
+                        }
                         var transactionType = element.type === 'in' ? 'Received' : 'Sent'
                         var destinationAddress = element.type === 'in' ? element.sender : element.recipient
                         var formattedDestinationAddress = `${destinationAddress.substr(0, 7)}...${destinationAddress.substr(destinationAddress.length - 7, 7)}`
@@ -334,20 +357,22 @@
                         clone.querySelector('.transaction-info').setAttribute('data-recipient', element.recipient)
                         clone.querySelector('.transaction-info').setAttribute('data-fee', element.fee)
                         clone.querySelector('.transaction-wrapper').addEventListener('click', function() {
-                            transactionModal(transactionId)
+                            showModal('transaction-modal', transactionId)
                         })
                         document.getElementById('transactions-container').appendChild(clone)
                     })
-                    var clonedBtn = btn.cloneNode(true)
-                    if(transactions.length === 50) {
-                        clonedBtn.classList.remove('hidden')
-                        clonedBtn.setAttribute('data-next', response.data.data.next)
-                        clonedBtn.addEventListener('click', function() {
-                            loadMore(clonedBtn)
-                        })
-                        document.getElementById('transactions-container').appendChild(clonedBtn)
+                    if(btn) {
+                        var clonedBtn = btn.cloneNode(true)
+                        if(transactions.length === 50) {
+                            clonedBtn.classList.remove('hidden')
+                            clonedBtn.setAttribute('data-next', response.data.data.next)
+                            clonedBtn.addEventListener('click', function() {
+                                loadMore(clonedBtn)
+                            })
+                            document.getElementById('transactions-container').appendChild(clonedBtn)
+                        }
+                        btn.remove()
                     }
-                    btn.remove()
                 } else {
                     var emptyMessage = document.createElement('div')
                     emptyMessage.innerHTML = 'No more transactions to show.'
@@ -471,9 +496,11 @@
         var amount = document.getElementById('amount-input')
         var address = document.getElementById('address-input')
         var submitBtn = document.getElementById('send-submit-btn')
+        var maxBtn = document.getElementById('send-max-btn')
         submitBtn.setAttribute('disabled', 'disabled')
         amount.setAttribute('disabled', 'disabled')
         address.setAttribute('disabled', 'disabled')
+        maxBtn.setAttribute('disabled', 'disabled')
         submitBtn.classList.remove('cursor-pointer')
         var data = {
             amount: amount.value,
@@ -486,7 +513,6 @@
             data: data
         })
             .then(function(response) {
-                console.log(response)
                 if(response.data.success) {
                     notyf.success('Sent!')
                     closeModal(document.getElementById('send-modal'))
@@ -494,16 +520,19 @@
                     document.getElementById('send-funds-price').textContent = '0.00'
                 } else {
                     notyf.error('Error has occured!')
-                    submitBtn.removeAttribute('disabled')
-                    amount.removeAttribute('disabled')
-                    address.removeAttribute('disabled')
-                    submitBtn.classList.add('cursor-pointer')
                 }
+                submitBtn.removeAttribute('disabled')
+                amount.removeAttribute('disabled')
+                address.removeAttribute('disabled')
+                maxBtn.removeAttribute('disabled')
+                submitBtn.classList.add('cursor-pointer')
+                setTimeout(loadMore, 1000)
             })
             .catch(function(error) {
                 submitBtn.removeAttribute('disabled')
                 amount.removeAttribute('disabled')
                 address.removeAttribute('disabled')
+                maxBtn.removeAttribute('disabled')
                 submitBtn.classList.add('cursor-pointer')
                 notyf.error(error.response.data.message)
             })
@@ -576,18 +605,20 @@
         Promise.all([getBalance, getPrice, getLastTransaction])
             .then(function(responses) {
                 // Change balance & price
-                document.getElementById('wallet-balance').textContent = `${newState.balance}`
-                document.getElementById('wallet-balance-usd').textContent = `$${(newState.balance * newState.price).toFixed(2)}`
-                document.getElementById('wallet-price-change').textContent = `${newState.priceChange.toFixed(2)}%`
-                document.getElementById('wallet-price-change').classList.remove('text-green-200', 'text-red-300')
-                if(newState.priceChange > 0) {
-                    document.getElementById('wallet-price-change').classList.add('text-green-200')
-                } else {
-                    document.getElementById('wallet-price-change').classList.add('text-red-300')
+                if(newState.balance !== null && newState.balance !== undefined && newState.balance !== NaN) {
+                    document.getElementById('wallet-balance').textContent = `${newState.balance}`
+                    document.getElementById('wallet-balance-usd').textContent = `$${(newState.balance * newState.price).toFixed(2)}`
+                    document.getElementById('wallet-price-change').textContent = `${newState.priceChange.toFixed(2)}%`
+                    document.getElementById('wallet-price-change').classList.remove('text-green-200', 'text-red-300')
+                    if(newState.priceChange > 0) {
+                        document.getElementById('wallet-price-change').classList.add('text-green-200')
+                    } else {
+                        document.getElementById('wallet-price-change').classList.add('text-red-300')
+                    }
                 }
                 // Check last transaction
                 if(newState.lastTransaction !== walletState.lastTransaction) {
-                    notyf.success('New transaction!')
+                    loadMore()
                 }
                 // Enable refresh button
                 refreshBtn.removeAttribute('disabled')
@@ -601,4 +632,6 @@
                 notyf.error('An error has occured!')
             })
     }
+    // Check periodically for new transactions
+    setInterval(loadMore, 30000)
 </script>

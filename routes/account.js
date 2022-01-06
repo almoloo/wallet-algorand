@@ -115,7 +115,7 @@ router.post('/login', async (req, res) => {
 
 // ----- LOGOUT USER
 router.get('/logout', authenticateToken, (req, res) => {
-	res.send('LOGOUT')
+	res.clearCookie('account').redirect('/')
 })
 
 // ----- GET USER
