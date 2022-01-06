@@ -1,6 +1,6 @@
 # ALGOWALLET
 ##### A custodial Algorand wallet using Tatum's API built on node.js with express.
-[View online demo on heroku](https://algo-wallet.herokuapp.com)
+[View online demo on heroku(testnet)](https://algo-wallet.herokuapp.com)
 
 ![wallet-algorand](/screenshots/hero.png)
 > This project was developed for a [30-day contest on gitcoin](https://gitcoin.co/issue/algorandfoundation/grow-algorand/122/100027180). It was not tested thoroughly and is in no way suitable for production use. Please use with caution!
@@ -20,6 +20,12 @@
 * [Tatum API and SDK](https://tatum.io/) were used for the core functionality(e.g. Generating wallets, Getting wallet balance, transfering funds to another address...)
 * [algoexplorer.io](https://algoexplorer.io) API was used to retrieve all previous transactions for a given address. Tatum lacked this functionality.
 * [CoinGecko API](https://www.coingecko.com/en/api) was used to retrieve current price and daily change for ALGO.
+
+### Environmental variables
+* PORT: The port you want the project to be run at
+* TOKEN_SECRET & REFRESH_SECRET: A random piece of string used to hash passwords
+* TATUM_API_KEY & TATUM_API_URL: You can aquire api key and url from your Tatum dashboard
+* FIREBASE_KEY: The service account object you aquired from firebase settings section
 
 ### License
 Distributed under the MIT License. See [LICENSE](/LICENSE) for more information.
