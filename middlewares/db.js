@@ -9,7 +9,7 @@ const {
 	Timestamp,
 	FieldValue,
 } = require('firebase-admin/firestore')
-const serviceAccount = require('../firebasekey.json')
+const serviceAccount = JSON.parse(process.env.FIREBASE_KEY)
 const { JsonWebTokenError } = require('jsonwebtoken')
 initializeApp({
 	credential: cert(serviceAccount),

@@ -1,6 +1,7 @@
 {
     "name": "Algorand Wallet",
     "short_name": "algo wallet",
+    "start_url": "https://algo.liara.run",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
