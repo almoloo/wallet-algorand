@@ -37,6 +37,7 @@ router.get('/', (req, res) => {
 					balance: balance,
 					price: price,
 					priceChange: priceChange,
+					username: user.username,
 				})
 			})
 		} catch (err) {
