@@ -347,7 +347,6 @@
                         clone.querySelector('.transaction-info').setAttribute('data-timestamp', element.date)
                         clone.querySelector('.transaction-info').setAttribute('data-sender', element.sender)
                         clone.querySelector('.transaction-info').setAttribute('data-recipient', element.recipient)
-                        clone.querySelector('.transaction-info').setAttribute('data-fee', element.fee)
                         clone.querySelector('.transaction-wrapper').addEventListener('click', function() {
                             showModal('transaction-modal', transactionId)
                         })
