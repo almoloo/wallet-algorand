@@ -21,11 +21,38 @@
 * [algoexplorer.io](https://algoexplorer.io) API was used to retrieve all previous transactions for a given address. Tatum lacked this functionality.
 * [CoinGecko API](https://www.coingecko.com/en/api) was used to retrieve current price and daily change for ALGO.
 
-### Environmental variables
-* PORT: The port you want the project to be run at
-* TOKEN_SECRET & REFRESH_SECRET: A random piece of string used to hash passwords
-* TATUM_API_KEY & TATUM_API_URL: You can aquire api key and url from your Tatum dashboard
-* FIREBASE_KEY: The service account object you aquired from firebase settings section
+### Installation
+1. Download and install node.js from [https://nodejs.org](https://nodejs.org)
+1. Clone the project
+  ```
+    git clone https://github.com/almoloo/wallet-algorand.git
+  ```
+3. Cd into the cloned directory and install dependencies
+  ```
+    cd wallet-algorand
+    npm install
+  ```
+4. Create new dotenv file in the root of the project with said variables
+  ```
+    touch .env
+  ```
+  ##### Environmental variables
+  * PORT: The port you want the project to be run at
+  * TOKEN_SECRET & REFRESH_SECRET: A random piece of string used to hash passwords
+  * TATUM_API_KEY & TATUM_API_URL: You can aquire api key and url from your Tatum dashboard
+  * FIREBASE_KEY: The service account object you aquired from firebase settings section
+5. Start either the production or development server
+  ```
+    # Development
+    npm run dev
+    # Production
+    npm start
+  ```
+6. Open your browser of choice and navigate to `http://localhost:3000/`
+7. In order to rebuild the css file run the following command in the root of the project
+  ```
+    npx tailwindcss -i ./wwwroot/styles/src.style.css -o ./wwwroot/styles/style.css --watch
+  ```
 
 ### License
 Distributed under the MIT License. See [LICENSE](/LICENSE) for more information.
